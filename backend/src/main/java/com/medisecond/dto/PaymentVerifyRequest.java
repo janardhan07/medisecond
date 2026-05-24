@@ -1,0 +1,8 @@
+package com.medisecond.dto;
+import lombok.*;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
+public class PaymentVerifyRequest {
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private String razorpaySignature;
+}
