@@ -1,17 +1,12 @@
 package com.medisecond.dto;
 import lombok.*;
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
-public class RegisterRequest {
-    private String username;
-    private String email;
-    private String password;
-    private String role;
-    private String phoneNumber;
-    // Doctor-specific fields (ignored for patients)
+public class DoctorProfileRequest {
     private String specialty;
     private String city;
     private String clinicAddress;
     private Integer experienceYears;
     private Integer consultationFee;
     private String bio;
+    private Boolean available;
 }

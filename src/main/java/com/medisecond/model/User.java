@@ -33,6 +33,39 @@ public class User implements UserDetails {
 
     private String phoneNumber;
 
+    // ── Doctor profile fields ────────────────────────────────────────────────
+
+    /** Medical specialty e.g. "Cardiologist", "Neurologist" */
+    private String specialty;
+
+    /** City / area the doctor operates from e.g. "Mumbai", "Delhi - Connaught Place" */
+    private String city;
+
+    /** Full clinic address */
+    private String clinicAddress;
+
+    /** Years of experience */
+    private Integer experienceYears;
+
+    /** Consultation fee in INR */
+    private Integer consultationFee;
+
+    /** Short bio / qualifications */
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    /** Average rating 0.0–5.0, updated when patients submit reviews */
+    @Builder.Default
+    private Double rating = 0.0;
+
+    /** Total number of ratings received */
+    @Builder.Default
+    private Integer ratingCount = 0;
+
+    /** Whether the doctor is accepting new patients */
+    @Builder.Default
+    private Boolean available = true;
+
     public enum Role {
         PATIENT, DOCTOR, ADMIN
     }
