@@ -8,9 +8,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "doctor_reviews")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DoctorReview {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,11 +27,9 @@ public class DoctorReview {
     private User patient;
 
     @Column(nullable = false)
-    private Integer rating; // 1–5
-
+    private Integer rating; // 1-5
     @Column(columnDefinition = "TEXT")
     private String comment;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

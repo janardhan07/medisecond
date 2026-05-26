@@ -1,10 +1,13 @@
 package com.medisecond.dto;
-import com.medisecond.model.DoctorReview;
-import lombok.*;
-import java.time.LocalDateTime;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewRequest {
-    private Integer rating;   // 1–5
+    private Integer rating;
     private String comment;
 }

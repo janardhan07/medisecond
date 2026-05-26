@@ -22,9 +22,9 @@ public class MedicalCaseService {
         return switch (user.getRole()) {
             case PATIENT -> caseRepository.findByPatientOrderByCreatedAtDesc(user)
                     .stream().map(MedicalCaseResponse::from).toList();
-            case DOCTOR  -> caseRepository.findByAssignedDoctorOrderByCreatedAtDesc(user)
+            case DOCTOR -> caseRepository.findByAssignedDoctorOrderByCreatedAtDesc(user)
                     .stream().map(MedicalCaseResponse::from).toList();
-            case ADMIN   -> caseRepository.findAll()
+            case ADMIN -> caseRepository.findAll()
                     .stream().map(MedicalCaseResponse::from).toList();
         };
     }
@@ -60,8 +60,8 @@ public class MedicalCaseService {
     private void checkAccess(MedicalCase c, User user) {
         boolean allowed = switch (user.getRole()) {
             case PATIENT -> c.getPatient().getId().equals(user.getId());
-            case DOCTOR  -> c.getAssignedDoctor() != null && c.getAssignedDoctor().getId().equals(user.getId());
-            case ADMIN   -> true;
+            case DOCTOR -> c.getAssignedDoctor() != null && c.getAssignedDoctor().getId().equals(user.getId());
+            case ADMIN -> true;
         };
         if (!allowed) throw new AccessDeniedException("Access denied");
     }

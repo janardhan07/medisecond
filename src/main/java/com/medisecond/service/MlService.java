@@ -51,7 +51,8 @@ public class MlService {
         KEYWORD_SPECIALTY.put("weakness", "General Physician");
     }
 
-    public record Prediction(String specialty, double confidence) {}
+    public record Prediction(String specialty, double confidence) {
+    }
 
     public Prediction predict(String symptoms) {
         if (symptoms == null || symptoms.isBlank()) {

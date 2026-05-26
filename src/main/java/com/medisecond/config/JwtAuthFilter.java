@@ -20,41 +20,29 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-
     private final JwtService jwtService;
     private final UserService userService;
 
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
-
-        final String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain) throws ServletException, IOException {
+        String auth = req.getHeader("Authorization");
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            chain.doFilter(req, res);
             return;
         }
-
-        final String jwt = authHeader.substring(7);
         try {
-            final String username = jwtService.extractUsername(jwt);
-
+            String jwt = auth.substring(7);
+            String username = jwtService.extractUsername(jwt);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userService.loadUserByUsername(username);
-
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                UserDetails ud = userService.loadUserByUsername(username);
+                if (jwtService.isTokenValid(jwt, ud)) {
+                    var at = new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
+                    at.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                    SecurityContextHolder.getContext().setAuthentication(at);
                 }
             }
         } catch (Exception ignored) {
-            // Invalid token — just continue without auth
         }
-
-        filterChain.doFilter(request, response);
+        chain.doFilter(req, res);
     }
 }

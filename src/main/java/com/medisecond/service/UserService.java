@@ -17,134 +17,92 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-
-    private final UserRepository userRepository;
-    private final DoctorReviewRepository reviewRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepo;
+    private final DoctorReviewRepository reviewRepo;
+    private final PasswordEncoder encoder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String u) throws UsernameNotFoundException {
+        return userRepo.findByUsername(u).orElseThrow(() -> new UsernameNotFoundException("User not found: " + u));
     }
 
-    public User register(RegisterRequest req) {
-        if (userRepository.existsByUsername(req.getUsername())) {
-            throw new RuntimeException("Username already taken");
-        }
-        if (userRepository.existsByEmail(req.getEmail())) {
-            throw new RuntimeException("Email already in use");
-        }
-
+    public User register(RegisterRequest r) {
+        if (userRepo.existsByUsername(r.getUsername())) throw new RuntimeException("Username already taken");
+        if (userRepo.existsByEmail(r.getEmail())) throw new RuntimeException("Email already in use");
         User.Role role;
         try {
-            role = User.Role.valueOf(req.getRole() != null ? req.getRole().toUpperCase() : "PATIENT");
-        } catch (IllegalArgumentException e) {
+            role = User.Role.valueOf(r.getRole() != null ? r.getRole().toUpperCase() : "PATIENT");
+        } catch (Exception e) {
             role = User.Role.PATIENT;
         }
-
-        User user = User.builder()
-                .username(req.getUsername())
-                .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .role(role)
-                .phoneNumber(req.getPhoneNumber())
-                // Doctor profile fields
-                .specialty(req.getSpecialty())
-                .city(req.getCity())
-                .clinicAddress(req.getClinicAddress())
-                .experienceYears(req.getExperienceYears())
-                .consultationFee(req.getConsultationFee())
-                .bio(req.getBio())
-                .build();
-
-        return userRepository.save(user);
+        return userRepo.save(User.builder()
+                .username(r.getUsername()).email(r.getEmail()).password(encoder.encode(r.getPassword()))
+                .role(role).phoneNumber(r.getPhoneNumber()).fullName(r.getFullName()).gender(r.getGender())
+                .specialty(r.getSpecialty()).city(r.getCity()).area(r.getArea())
+                .clinicName(r.getClinicName()).clinicAddress(r.getClinicAddress())
+                .experienceYears(r.getExperienceYears()).consultationFee(r.getConsultationFee())
+                .bio(r.getBio()).qualifications(r.getQualifications()).languages(r.getLanguages())
+                .onlineConsultation(Boolean.TRUE.equals(r.getOnlineConsultation()))
+                .age(r.getAge()).bloodGroup(r.getBloodGroup()).build());
     }
 
-    // ── Doctor profile update ────────────────────────────────────────────────
-
-    public UserDto updateDoctorProfile(User doctor, DoctorProfileRequest req) {
-        doctor.setSpecialty(req.getSpecialty());
-        doctor.setCity(req.getCity());
-        doctor.setClinicAddress(req.getClinicAddress());
-        doctor.setExperienceYears(req.getExperienceYears());
-        doctor.setConsultationFee(req.getConsultationFee());
-        doctor.setBio(req.getBio());
-        if (req.getAvailable() != null) {
-            doctor.setAvailable(req.getAvailable());
-        }
-        return UserDto.from(userRepository.save(doctor));
-    }
-
-    // ── Doctor search ────────────────────────────────────────────────────────
-
-    public List<UserDto> searchDoctors(String city, String specialty) {
-        List<User> doctors;
-        boolean hasCity      = city != null && !city.isBlank();
-        boolean hasSpecialty = specialty != null && !specialty.isBlank();
-
-        if (hasCity && hasSpecialty) {
-            doctors = userRepository.findDoctorsByCityAndSpecialty(city, specialty);
-        } else if (hasCity) {
-            doctors = userRepository.findDoctorsByCity(city);
-        } else if (hasSpecialty) {
-            doctors = userRepository.findDoctorsBySpecialty(specialty);
-        } else {
-            doctors = userRepository.findAllAvailableDoctors();
-        }
-
-        return doctors.stream().map(UserDto::from).toList();
-    }
-
-    public List<String> getAllCities() {
-        return userRepository.findAllDoctorCities();
+    public List<UserDto> searchDoctors(String city, String specialty, String area) {
+        return userRepo.searchDoctors(
+                (city != null && !city.isBlank()) ? city : null,
+                (specialty != null && !specialty.isBlank()) ? specialty : null,
+                (area != null && !area.isBlank()) ? area : null
+        ).stream().map(UserDto::from).toList();
     }
 
     public UserDto getDoctorById(Long id) {
-        User doctor = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
-        if (doctor.getRole() != User.Role.DOCTOR) {
-            throw new RuntimeException("User is not a doctor");
-        }
-        return UserDto.from(doctor);
+        return UserDto.from(userRepo.findById(id).orElseThrow(() -> new RuntimeException("Doctor not found")));
     }
 
-    // ── Reviews ──────────────────────────────────────────────────────────────
+    public UserDto updateDoctorProfile(User doctor, DoctorProfileRequest r) {
+        if (r.getFullName() != null) doctor.setFullName(r.getFullName());
+        if (r.getGender() != null) doctor.setGender(r.getGender());
+        if (r.getPhoneNumber() != null) doctor.setPhoneNumber(r.getPhoneNumber());
+        if (r.getSpecialty() != null) doctor.setSpecialty(r.getSpecialty());
+        if (r.getCity() != null) doctor.setCity(r.getCity());
+        if (r.getArea() != null) doctor.setArea(r.getArea());
+        if (r.getClinicName() != null) doctor.setClinicName(r.getClinicName());
+        if (r.getClinicAddress() != null) doctor.setClinicAddress(r.getClinicAddress());
+        if (r.getExperienceYears() != null) doctor.setExperienceYears(r.getExperienceYears());
+        if (r.getConsultationFee() != null) doctor.setConsultationFee(r.getConsultationFee());
+        if (r.getBio() != null) doctor.setBio(r.getBio());
+        if (r.getQualifications() != null) doctor.setQualifications(r.getQualifications());
+        if (r.getLanguages() != null) doctor.setLanguages(r.getLanguages());
+        if (r.getAvailable() != null) doctor.setAvailable(r.getAvailable());
+        if (r.getOnlineConsultation() != null) doctor.setOnlineConsultation(r.getOnlineConsultation());
+        return UserDto.from(userRepo.save(doctor));
+    }
 
     public ReviewResponse submitReview(Long doctorId, ReviewRequest req, User patient) {
-        User doctor = userRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
-
-        if (doctor.getRole() != User.Role.DOCTOR) {
-            throw new RuntimeException("Target user is not a doctor");
-        }
-
-        if (req.getRating() < 1 || req.getRating() > 5) {
-            throw new RuntimeException("Rating must be between 1 and 5");
-        }
-
-        // One review per patient per doctor — update if exists
-        DoctorReview review = reviewRepository.findByDoctorAndPatient(doctor, patient)
+        User doctor = userRepo.findById(doctorId).orElseThrow(() -> new RuntimeException("Doctor not found"));
+        if (req.getRating() < 1 || req.getRating() > 5) throw new RuntimeException("Rating must be 1-5");
+        DoctorReview review = reviewRepo.findByDoctorAndPatient(doctor, patient)
                 .orElse(DoctorReview.builder().doctor(doctor).patient(patient).build());
-
         review.setRating(req.getRating());
         review.setComment(req.getComment());
-        reviewRepository.save(review);
-
-        // Recalculate doctor's average rating
-        List<DoctorReview> allReviews = reviewRepository.findByDoctorOrderByCreatedAtDesc(doctor);
-        double avg = allReviews.stream().mapToInt(DoctorReview::getRating).average().orElse(0.0);
+        reviewRepo.save(review);
+        var all = reviewRepo.findByDoctorOrderByCreatedAtDesc(doctor);
+        double avg = all.stream().mapToInt(DoctorReview::getRating).average().orElse(0);
         doctor.setRating(Math.round(avg * 10.0) / 10.0);
-        doctor.setRatingCount(allReviews.size());
-        userRepository.save(doctor);
-
+        doctor.setRatingCount(all.size());
+        userRepo.save(doctor);
         return ReviewResponse.from(review);
     }
 
     public List<ReviewResponse> getDoctorReviews(Long doctorId) {
-        User doctor = userRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
-        return reviewRepository.findByDoctorOrderByCreatedAtDesc(doctor)
-                .stream().map(ReviewResponse::from).toList();
+        User doctor = userRepo.findById(doctorId).orElseThrow(() -> new RuntimeException("Not found"));
+        return reviewRepo.findByDoctorOrderByCreatedAtDesc(doctor).stream().map(ReviewResponse::from).toList();
+    }
+
+    public List<String> getAllCities() {
+        return userRepo.findAllDoctorCities();
+    }
+
+    public List<String> getAllSpecialties() {
+        return userRepo.findAllDoctorSpecialties();
     }
 }

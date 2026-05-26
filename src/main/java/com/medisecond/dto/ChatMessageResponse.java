@@ -1,18 +1,28 @@
 package com.medisecond.dto;
+
 import com.medisecond.model.ChatMessage;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatMessageResponse {
     private Long id;
     private Long senderId;
     private String senderUsername;
     private String message;
     private LocalDateTime createdAt;
+
     public static ChatMessageResponse from(ChatMessage m) {
         return ChatMessageResponse.builder()
-            .id(m.getId()).senderId(m.getSender().getId())
-            .senderUsername(m.getSender().getUsername())
-            .message(m.getMessage()).createdAt(m.getCreatedAt()).build();
+                .id(m.getId()).senderId(m.getSender().getId())
+                .senderUsername(m.getSender().getUsername())
+                .message(m.getMessage()).createdAt(m.getCreatedAt()).build();
     }
 }

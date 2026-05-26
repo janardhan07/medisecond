@@ -9,7 +9,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment_transactions")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PaymentTransaction {
 
     @Id

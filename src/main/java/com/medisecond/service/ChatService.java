@@ -42,8 +42,8 @@ public class ChatService {
     private void checkChatAccess(MedicalCase c, User user) {
         boolean allowed = switch (user.getRole()) {
             case PATIENT -> c.getPatient().getId().equals(user.getId());
-            case DOCTOR  -> c.getAssignedDoctor() != null && c.getAssignedDoctor().getId().equals(user.getId());
-            case ADMIN   -> true;
+            case DOCTOR -> c.getAssignedDoctor() != null && c.getAssignedDoctor().getId().equals(user.getId());
+            case ADMIN -> true;
         };
         if (!allowed) throw new AccessDeniedException("You cannot access this chat");
     }

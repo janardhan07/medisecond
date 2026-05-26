@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
-    private String username, password;
+public class AiSymptomRequest {
+    private String symptoms;
+    private String city;
 }

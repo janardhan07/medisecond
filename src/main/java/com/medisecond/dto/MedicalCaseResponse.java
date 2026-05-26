@@ -1,8 +1,17 @@
 package com.medisecond.dto;
+
 import com.medisecond.model.MedicalCase;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MedicalCaseResponse {
     private Long id;
     private String title;
@@ -16,14 +25,15 @@ public class MedicalCaseResponse {
     private Long assignedDoctorId;
     private String assignedDoctorUsername;
     private LocalDateTime createdAt;
+
     public static MedicalCaseResponse from(MedicalCase c) {
         return MedicalCaseResponse.builder()
-            .id(c.getId()).title(c.getTitle()).description(c.getDescription())
-            .symptoms(c.getSymptoms()).mlPredictedCategory(c.getMlPredictedCategory())
-            .mlConfidenceScore(c.getMlConfidenceScore()).status(c.getStatus().name())
-            .patientId(c.getPatient().getId()).patientUsername(c.getPatient().getUsername())
-            .assignedDoctorId(c.getAssignedDoctor() != null ? c.getAssignedDoctor().getId() : null)
-            .assignedDoctorUsername(c.getAssignedDoctor() != null ? c.getAssignedDoctor().getUsername() : null)
-            .createdAt(c.getCreatedAt()).build();
+                .id(c.getId()).title(c.getTitle()).description(c.getDescription())
+                .symptoms(c.getSymptoms()).mlPredictedCategory(c.getMlPredictedCategory())
+                .mlConfidenceScore(c.getMlConfidenceScore()).status(c.getStatus().name())
+                .patientId(c.getPatient().getId()).patientUsername(c.getPatient().getUsername())
+                .assignedDoctorId(c.getAssignedDoctor() != null ? c.getAssignedDoctor().getId() : null)
+                .assignedDoctorUsername(c.getAssignedDoctor() != null ? c.getAssignedDoctor().getUsername() : null)
+                .createdAt(c.getCreatedAt()).build();
     }
 }

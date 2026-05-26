@@ -11,7 +11,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "medical_cases")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MedicalCase {
 
     @Id

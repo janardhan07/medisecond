@@ -24,36 +24,23 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/medical/specialties",
-                                // Doctor search is public — like Practo
-                                "/api/doctors/search",
-                                "/api/doctors/cities",
-                                "/api/doctors/*/reviews",
-                                "/api/doctors/*"
-                        ).permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(a -> a
+                        .requestMatchers("/api/auth/**", "/api/doctors/search", "/api/doctors/cities",
+                                "/api/doctors/specialties", "/api/doctors/{id}", "/api/doctors/{id}/reviews",
+                                "/api/ai/**").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .headers(h -> h.frameOptions(f -> f.disable()))
                 .build();
     }
 

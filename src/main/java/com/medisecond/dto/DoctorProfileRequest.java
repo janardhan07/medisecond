@@ -1,12 +1,16 @@
 package com.medisecond.dto;
-import lombok.*;
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DoctorProfileRequest {
-    private String specialty;
-    private String city;
-    private String clinicAddress;
-    private Integer experienceYears;
-    private Integer consultationFee;
-    private String bio;
-    private Boolean available;
+    private String fullName, gender, phoneNumber;
+    private String specialty, city, area, clinicName, clinicAddress;
+    private Integer experienceYears, consultationFee;
+    private String bio, qualifications, languages;
+    private Boolean available, onlineConsultation;
 }
